@@ -1,0 +1,266 @@
+package DYNMathOptimisation;
+
+import java.util.ArrayList;
+
+public class MathOptimisation {
+    DYNConstraint equation ;
+    DynSimplexConstraint [] matrix ;
+    DYNConstraint decisionConstraint;
+
+
+    public void simplexMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){
+        if(isBigMform(multiconstraintsFormat)) bigmMaximisation(equationSyntax,multiconstraintsFormat,decisionCondition) ;
+        else simplexInf(equationSyntax, multiconstraintsFormat, decisionCondition);
+
+    }   
+
+    protected boolean isBigMform(String [] multiConstraintsForm){
+        for (int i = 0; i < multiConstraintsForm.length; i++) {
+            if(!multiConstraintsForm[i].contains("<")) return true;
+        }
+        return false;
+    }
+
+    protected void simplexInf(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){
+        setEquation(equationSyntax, multiconstraintsFormat.length);
+        multiconstraintsFormat = formatSyntaxForMatrix(multiconstraintsFormat) ;
+        setMatrix(multiconstraintsFormat);
+        // mety ho maro ihany nefa ity fa aleo alony amzao
+        this.decisionConstraint = decisionCondition ;
+        while(!equation.allCoeffZero()){
+            // jerena ny coefficient max @ ilay equation
+            int maxPosition = equation.maxPositionCoeff();
+            // alaina izay sup a 0 @ iny colomne iny
+            Double [] sup0= superiorToZero(maxPosition) ;
+            if(counterOfDouble(sup0) ==0) return ;
+            // jerena indray ny minimum ( base / coeff) : pivot
+            int pivotPositionY = pivotPosition(sup0,0) ;
+            // ovaina ilay ery amn sisiny droite iny
+                matrix[pivotPositionY].solutionInit = equation.decisions[maxPosition];
+            // transformation de la ligne du pivot (sur pivot daholo)
+            matrix[pivotPositionY].setLineDivision(matrix[pivotPositionY].coeff[maxPosition]); 
+            // transformation de chaque ligne bas et haut tel que : Ln =Ln - (Ln.coeff[maxPosition])
+            doSimplexLineTransformation( pivotPositionY, maxPosition);
+
+        }
+    }
+    protected void bigmMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){
+        setMatrixBigM( equationSyntax ,multiconstraintsFormat, -1);
+        this.decisionConstraint = decisionCondition ;
+        Double [] refDecision = new Double [matrix[0].coeff.length];
+        refDecision = getSumMatrixCoeff();
+        while (!allCoeffInfOrZero(refDecision)) {
+            // jerena ny coefficient max @ ilay refDecision
+            int maxPosition = maxPositionCoeff(refDecision);
+            // alaina izay sup a 0 @ iny colomne iny
+            Double [] sup0= superiorToZero(maxPosition) ;
+            if(counterOfDouble(sup0) ==0) return ;
+            // jerena indray ny minimum ( base / coeff) : pivot
+            int pivotPositionY = pivotPosition(sup0,0) ;
+            // ovaina ilay ery amn sisiny droite iny
+                matrix[pivotPositionY].solutionInit = equation.decisions[maxPosition];
+                // lasa soloina ihany koa ilay coeffSolutionInit
+                matrix[pivotPositionY].setCoeffSolutionInit(equation.coeff[maxPosition]);
+            // transformation de la ligne du pivot (sur pivot daholo)
+            matrix[pivotPositionY].setLineDivision(matrix[pivotPositionY].coeff[maxPosition]); 
+            // transformation de chaque ligne bas et haut tel que : Ln =Ln - (Ln.coeff[maxPosition])
+            doSimplexLineTransformationBigM(pivotPositionY, maxPosition);
+
+            refDecision = getSumMatrixCoeff() ;
+        }
+
+
+    }
+    protected Double [] getSumMatrixCoeff(){
+        Double [] sum = new Double [matrix[0].coeff.length];
+        for (int i = 0; i < sum.length; i++) {
+            sum[i] =-1.*equation.coeff[i] ;
+        }
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < sum.length; j++) {
+                sum[j] =( sum[j]+matrix[i].coeff[j]*matrix[i].coeffSolutionInit);  
+            }
+        }        
+        for (int i = 0; i < sum.length; i++) {
+            sum[i]*=-1;
+        }
+        
+
+        return sum ;
+    }
+
+    protected void setMatrixBigM(String equationOrigin , String [] form , int coeff){
+        int bigM =  coeff*99999 ;
+        ArrayList<String> addedV = new ArrayList<String>() ;
+        // add all variables and stock
+        String ecart ="[s" ,artificial ="[v" ,ecartMin = "[min" ;
+        int ecartindice=0 , artificialIndice =0  ,ecartMinIndice =0;
+
+        for (int i = 0; i < form.length; i++) {
+            if (form[i].contains("<")) {
+                form[i]=form[i].substring(0,form[i].lastIndexOf("]")+1)+             
+                   "("+1+")"+ecart +ecartindice+"]"+ form[i].substring(form[i].lastIndexOf("]")+1);
+                   addedV.add(ecart +ecartindice+"]");
+                   ecartindice ++ ;
+            }else if (form[i].contains(">")) {
+                form[i]=form[i].substring(0,form[i].lastIndexOf("]")+1)+             
+                   "("+1+")"+artificial +artificialIndice+"]"+ "("+coeff+")"+ecartMin+ecartMinIndice+"]"+ form[i].substring(form[i].lastIndexOf("]")+1);
+                   addedV.add(artificial +artificialIndice+"]");
+                   addedV.add(ecartMin+ecartMinIndice+"]") ;
+                   ecartMinIndice++;
+                   artificialIndice ++ ;
+            }else{
+                form[i]=form[i].substring(0,form[i].lastIndexOf("]")+1)+             
+                   "("+1+")"+artificial +artificialIndice+"]"+ form[i].substring(form[i].lastIndexOf("]")+1);
+                    addedV.add(artificial +artificialIndice+"]") ;
+                    artificialIndice++;            
+            }
+        }
+        matrix = new DynSimplexConstraint[form.length];
+        for (int i = 0; i < form.length; i++) {
+            form[i] = fillTheMatrixBigM(form[i], addedV ,i ,bigM) ;
+        }
+        for (int i = 0; i < addedV.size(); i++) {
+            if(!addedV.get(i).contains("v"))
+            equationOrigin = equationOrigin+("(0)"+addedV.get(i)) ; 
+            else equationOrigin = equationOrigin+ "("+bigM+")"+addedV.get(i) ;
+        }
+        equation = new DYNConstraint(equationOrigin+"=0");
+
+    }
+    protected String fillTheMatrixBigM(String form , ArrayList<String> added ,int a ,int bigM){
+        String lastIndex = "(";
+        String solutionInit="";
+        Double coeffSolutionInit =0. ;
+        if (form.contains(">")) {
+            lastIndex= "(1)[v" ;
+        }
+        if(form.contains("v")){
+            coeffSolutionInit = bigM*1. ;
+        }
+        boolean s= false;
+        for (int i = 0; i < added.size(); i++) {
+            if (!form.contains(added.get(i))){
+                if (!s) {
+                    form = form.substring(0, form.lastIndexOf(lastIndex)) +"(0)"+added.get(i)+
+                            form.substring(form.lastIndexOf(lastIndex)) ;
+                }else{
+                    form = form.substring(0, form.lastIndexOf("]")+1) + "(0)"+added.get(i)+
+                            form.substring( form.lastIndexOf("]")+1) ;
+                }
+            }else{
+                if (!s) {
+                    solutionInit = added.get(i) ;
+                    s= true ;
+                }
+            }
+        }
+        matrix[a]= new DynSimplexConstraint(form, solutionInit ,coeffSolutionInit) ;
+        return form ;
+    }
+
+    public void setEquation(String equation , int addColumn) {
+        for (int i = 0; i < addColumn; i++) {
+            equation = equation+"("+0+")[s"+i+"]";
+        }
+
+        this.equation = new DYNConstraint(equation+"=0") ;
+    }
+
+    public void setMatrix(String [] m){
+        int numberOfLine = m.length ;
+        matrix = new DynSimplexConstraint[numberOfLine];
+        for (int i = 0; i < numberOfLine; i++) {
+            matrix[i]= new DynSimplexConstraint(m[i],"s"+i) ;
+        }
+    }
+    public String [] formatSyntaxForMatrix(String [] m){
+        String [] ls = new String [m.length]; 
+        ls [0] ="(1)"; 
+        for (int i = 1; i < m.length; i++) {
+            ls[i] = "(0)";
+        }
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 0; j < ls.length; j++) {
+                m[i] = m[i].substring(0, m[i].lastIndexOf("]")+1)+ls[j]+"[s"+j+"]" + m[i].substring(m[i].lastIndexOf("]")+1);
+            }
+            try {
+                ls[i+1]="(1)";
+                ls[i]="(0)";
+            } catch (Exception e) {
+                return m ;
+            }
+        }
+        return m ;
+    }
+
+    public Double [] superiorToZero(int maxPosition){
+        ArrayList<Double> ls = new ArrayList<Double>();
+        for (int i = 0; i < matrix.length; i++) {
+            if(matrix[i].coeff[maxPosition]>0) ls.add(matrix[i].coeff[maxPosition]);
+            else ls.add(null);
+        }
+        return ls.toArray(new Double [ls.size()]);
+    }
+
+    public int pivotPosition(Double [] ls ,int begin){
+        int minPosition = begin;
+        Double min =0. ;
+        try {
+             min =  matrix[0].limit/ ls[begin] ;
+        } catch (Exception e) {
+            return pivotPosition(ls, begin+1);
+        }
+        for (int i = 1; i < ls.length; i++) {
+            if(ls[i]== null) continue ;
+            Double temp = matrix[i].limit / ls[i] ;
+            if ( temp < min) {
+                min = temp;
+                minPosition = i;
+            }
+        }
+        return minPosition;
+    }
+    protected void doSimplexLineTransformationBigM(int pivotPosition ,int maxPosition){
+        for (int i = 0; i < matrix.length; i++) {
+            if(i!= pivotPosition && matrix[i].coeff[maxPosition]!=0)
+            matrix[i].setLineMinus(matrix[i].coeff[maxPosition],matrix[pivotPosition]);
+        }
+    }
+
+    public void doSimplexLineTransformation(int pivotPosition ,int maxPosition){
+        for (int i = 0; i < matrix.length; i++) {
+            if(i!= pivotPosition && matrix[i].coeff[maxPosition]!=0)
+            matrix[i].setLineMinus(matrix[i].coeff[maxPosition],matrix[pivotPosition]);
+        }
+        if ( equation.coeff[maxPosition]!=0)
+        this.equation.setLineMinus(equation.coeff[maxPosition],matrix[pivotPosition]);
+    }
+    private int counterOfDouble(Double [] d){
+        int init =0;
+        for (int i = 0; i < d.length; i++) {
+            if (d[i] != null) init ++;     
+        }
+        return init;
+
+    }
+    protected boolean allCoeffInfOrZero(Double[] dbl){
+        for (int i = 0; i < dbl.length; i++) {
+            if(dbl[i]>0) return false ;
+        }
+        return true ;
+    }
+    protected int maxPositionCoeff(Double [] refDecision){
+        int maxP =0 ;
+        Double maxN = refDecision[0] ;
+        for (int i = 1; i < refDecision.length; i++) {
+            if(maxN<refDecision[i]){
+                maxN= refDecision[i] ;
+                maxP = i ;
+            } 
+        }
+        return maxP ;
+    }
+
+
+}
