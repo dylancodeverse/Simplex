@@ -11,8 +11,11 @@ public class MathOptimisation {
     public void simplexMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
         if(isBigMform(multiconstraintsFormat)) bigmMaximisation(equationSyntax,multiconstraintsFormat,decisionCondition) ;
         else simplexInf(equationSyntax, multiconstraintsFormat, decisionCondition);
-
     }   
+    public void simplexMinimisation(String equationSyntax, String [] multiconstraintsFormat, DYNConstraint decisionCondition)throws Exception{
+        if(isBigMform(multiconstraintsFormat)) bigmMinimisation(equationSyntax,multiconstraintsFormat,decisionCondition) ;
+        else simplexSup(equationSyntax, multiconstraintsFormat, decisionCondition);
+    }
 
     protected boolean isBigMform(String [] multiConstraintsForm){
         for (int i = 0; i < multiConstraintsForm.length; i++) {
@@ -69,8 +72,32 @@ public class MathOptimisation {
 
             refDecision = getSumMatrixCoeff() ;
         }
+    }
+    protected void bigmMinimisation(String equationSyntax , String[] multiconstraintsFormat ,DYNConstraint decisionCondition){
+        setMatrixBigM( equationSyntax ,multiconstraintsFormat, -1);
+        this.decisionConstraint = decisionCondition ;
+        Double [] refDecision = new Double [matrix[0].coeff.length];
+        refDecision = getSumMatrixCoeff();
+        while (!allCoeffSupOrZero(refDecision)) {
+            // jerena ny coefficient min @ ilay refDecision
+            int minPosition = minPositionCoeff(refDecision);
+            // alaina izay sup a 0 @ iny colomne iny
+            Double [] sup0= superiorToZero(minPosition) ;
+            if(counterOfDouble(sup0) ==0) return ;
+            // jerena indray ny minimum ( base / coeff) : pivot
+            int pivotPositionY = pivotPosition(sup0,0) ;
+            // ovaina ilay ery amn sisiny droite iny
+                matrix[pivotPositionY].solutionInit = equation.decisions[minPosition];
+                // lasa soloina ihany koa ilay coeffSolutionInit
+                matrix[pivotPositionY].setCoeffSolutionInit(equation.coeff[minPosition]);
+            // transformation de la ligne du pivot (sur pivot daholo)
+            matrix[pivotPositionY].setLineDivision(matrix[pivotPositionY].coeff[minPosition]); 
+            // transformation de chaque ligne bas et haut tel que : Ln =Ln - (Ln.coeff[minPosition])
+            doSimplexLineTransformationBigM(pivotPositionY, minPosition);
 
-
+            refDecision = getSumMatrixCoeff() ;
+        }
+        
     }
     protected Double [] getSumMatrixCoeff(){
         Double [] sum = new Double [matrix[0].coeff.length];
@@ -251,6 +278,13 @@ public class MathOptimisation {
         }
         return true ;
     }
+    protected boolean allCoeffSupOrZero(Double[] dbl) {
+        for (int i = 0; i < dbl.length; i++) {
+            if(dbl[i] < 0) return false ;
+        }
+        return true ;
+    }
+    
     protected int maxPositionCoeff(Double [] refDecision){
         int maxP =0 ;
         Double maxN = refDecision[0] ;
@@ -261,6 +295,17 @@ public class MathOptimisation {
             } 
         }
         return maxP ;
+    }
+    protected int minPositionCoeff(Double [] refDecision){
+        int minP =0 ;
+        Double minN = refDecision[0] ;
+        for (int i = 1; i < refDecision.length; i++) {
+            if(minN>refDecision[i]){
+                minN= refDecision[i] ;
+                minP = i ;
+            } 
+        }
+        return minP ;
     }
 
 
