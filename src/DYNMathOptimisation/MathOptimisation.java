@@ -63,9 +63,10 @@ public class MathOptimisation {
             int pivotPositionY = pivotPosition(sup0,0) ;
             // ovaina ilay ery amn sisiny droite iny
                 matrix[pivotPositionY].solutionInit = equation.decisions[minPosition];
-                // lasa soloina ihany koa ilay coeffSolutionInit
-                matrix[pivotPositionY].setCoeffSolutionInit(equation.coeff[minPosition]);
             // transformation de la ligne du pivot (sur pivot daholo)
+            matrix[pivotPositionY].setLineDivision(matrix[pivotPositionY].coeff[minPosition]); 
+            // transformation de chaque ligne bas et haut tel que : Ln =Ln - (Ln.coeff[maxPosition])
+            doSimplexLineTransformation( pivotPositionY, minPosition);
 
         }
     }
@@ -93,9 +94,15 @@ public class MathOptimisation {
 
             refDecision = getSumMatrixCoeff() ;
         }
+        // manome anle reponse farany anle maximization:
+        equation.limit = 0.;
+        for (int i = 0; i < matrix.length; i++) {
+            equation.limit = equation.limit + matrix[i].limit*matrix[i].coeffSolutionInit;
+        }
+
     }
     protected void bigmMinimisation(String equationSyntax , String[] multiconstraintsFormat ,DYNConstraint decisionCondition){
-        setMatrixBigM( equationSyntax ,multiconstraintsFormat, -1);
+        setMatrixBigM( equationSyntax ,multiconstraintsFormat, 1);
         this.decisionConstraint = decisionCondition ;
         Double [] refDecision = new Double [matrix[0].coeff.length];
         refDecision = getSumMatrixCoeff();
@@ -153,7 +160,7 @@ public class MathOptimisation {
                    ecartindice ++ ;
             }else if (form[i].contains(">")) {
                 form[i]=form[i].substring(0,form[i].lastIndexOf("]")+1)+             
-                   "("+1+")"+artificial +artificialIndice+"]"+ "("+coeff+")"+ecartMin+ecartMinIndice+"]"+ form[i].substring(form[i].lastIndexOf("]")+1);
+                   "("+1+")"+artificial +artificialIndice+"]"+ "("+-1+")"+ecartMin+ecartMinIndice+"]"+ form[i].substring(form[i].lastIndexOf("]")+1);
                    addedV.add(artificial +artificialIndice+"]");
                    addedV.add(ecartMin+ecartMinIndice+"]") ;
                    ecartMinIndice++;
@@ -208,7 +215,7 @@ public class MathOptimisation {
         return form ;
     }
 
-    public void setEquation(String equation , int addColumn) {
+    protected void setEquation(String equation , int addColumn) {
         for (int i = 0; i < addColumn; i++) {
             equation = equation+"("+0+")[s"+i+"]";
         }
@@ -216,14 +223,14 @@ public class MathOptimisation {
         this.equation = new DYNConstraint(equation+"=0") ;
     }
 
-    public void setMatrix(String [] m){
+    protected void setMatrix(String [] m){
         int numberOfLine = m.length ;
         matrix = new DynSimplexConstraint[numberOfLine];
         for (int i = 0; i < numberOfLine; i++) {
             matrix[i]= new DynSimplexConstraint(m[i],"s"+i) ;
         }
     }
-    public String [] formatSyntaxForMatrix(String [] m){
+    protected String [] formatSyntaxForMatrix(String [] m){
         String [] ls = new String [m.length]; 
         ls [0] ="(1)"; 
         for (int i = 1; i < m.length; i++) {
@@ -243,7 +250,7 @@ public class MathOptimisation {
         return m ;
     }
 
-    public Double [] superiorToZero(int maxPosition){
+    protected Double [] superiorToZero(int maxPosition){
         ArrayList<Double> ls = new ArrayList<Double>();
         for (int i = 0; i < matrix.length; i++) {
             if(matrix[i].coeff[maxPosition]>0) ls.add(matrix[i].coeff[maxPosition]);
@@ -252,7 +259,7 @@ public class MathOptimisation {
         return ls.toArray(new Double [ls.size()]);
     }
 
-    public int pivotPosition(Double [] ls ,int begin){
+    protected int pivotPosition(Double [] ls ,int begin){
         int minPosition = begin;
         Double min =0. ;
         try {
@@ -277,7 +284,7 @@ public class MathOptimisation {
         }
     }
 
-    public void doSimplexLineTransformation(int pivotPosition ,int maxPosition){
+    protected void doSimplexLineTransformation(int pivotPosition ,int maxPosition){
         for (int i = 0; i < matrix.length; i++) {
             if(i!= pivotPosition && matrix[i].coeff[maxPosition]!=0)
             matrix[i].setLineMinus(matrix[i].coeff[maxPosition],matrix[pivotPosition]);
