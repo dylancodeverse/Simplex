@@ -91,6 +91,17 @@ public class DYNConstraint {
         }
         return maxPosition;
     }
+    public int minPositionCoeff() {
+        int minPosition = 0;
+        Double min = coeff[0];
+        for (int i = 1; i < coeff.length; i++) {
+            if (coeff[i] < min) {
+                min = coeff[i];
+                minPosition = i;
+            }
+        }
+        return minPosition;
+    }
 
     public void setLineDivision(Double division) {
         for (int i = 0; i < coeff.length; i++) {
@@ -104,9 +115,15 @@ public class DYNConstraint {
         }
         this.limit = this.limit -coeff *other.limit ;
     }
-    public boolean allCoeffZero(){
+    public boolean allCoeffZeroOrInf(){
         for (int i = 0; i < coeff.length; i++) {
             if(coeff[i]>0) return false ;
+        }
+        return true ;
+    }
+    public boolean allCoeffZeroOrSup(){
+        for (int i = 0; i < coeff.length; i++) {
+            if(coeff[i]<0) return false ;
         }
         return true ;
     }

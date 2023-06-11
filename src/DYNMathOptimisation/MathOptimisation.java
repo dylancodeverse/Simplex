@@ -8,13 +8,13 @@ public class MathOptimisation {
     DYNConstraint decisionConstraint;
 
 
-    public void simplexMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
+    public void simplexMaximization(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
         if(isBigMform(multiconstraintsFormat)) bigmMaximisation(equationSyntax,multiconstraintsFormat,decisionCondition) ;
-        else simplexInf(equationSyntax, multiconstraintsFormat, decisionCondition);
+        else simplexInfMaximization(equationSyntax, multiconstraintsFormat, decisionCondition);
     }   
     public void simplexMinimisation(String equationSyntax, String [] multiconstraintsFormat, DYNConstraint decisionCondition)throws Exception{
         if(isBigMform(multiconstraintsFormat)) bigmMinimisation(equationSyntax,multiconstraintsFormat,decisionCondition) ;
-        else simplexSup(equationSyntax, multiconstraintsFormat, decisionCondition);
+        else simplexInfMinimalization(equationSyntax, multiconstraintsFormat, decisionCondition);
     }
 
     protected boolean isBigMform(String [] multiConstraintsForm){
@@ -24,13 +24,13 @@ public class MathOptimisation {
         return false;
     }
 
-    protected void simplexInf(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
+    protected void simplexInfMaximization(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
         setEquation(equationSyntax, multiconstraintsFormat.length);
         multiconstraintsFormat = formatSyntaxForMatrix(multiconstraintsFormat) ;
         setMatrix(multiconstraintsFormat);
         // mety ho maro ihany nefa ity fa aleo alony amzao
         this.decisionConstraint = decisionCondition ;
-        while(!equation.allCoeffZero()){
+        while(!equation.allCoeffZeroOrInf()){
             // jerena ny coefficient max @ ilay equation
             int maxPosition = equation.maxPositionCoeff();
             // alaina izay sup a 0 @ iny colomne iny
@@ -44,8 +44,29 @@ public class MathOptimisation {
             matrix[pivotPositionY].setLineDivision(matrix[pivotPositionY].coeff[maxPosition]); 
             // transformation de chaque ligne bas et haut tel que : Ln =Ln - (Ln.coeff[maxPosition])
             doSimplexLineTransformation( pivotPositionY, maxPosition);
+        }
 
-            
+    }
+    protected void simplexInfMinimalization(String equationSyntax, String [] multiconstraintsFormat, DYNConstraint decisionCondition) throws Exception{
+        setEquation(equationSyntax, multiconstraintsFormat.length);
+        multiconstraintsFormat = formatSyntaxForMatrix(multiconstraintsFormat) ;
+        setMatrix(multiconstraintsFormat);
+        // mety ho maro ihany nefa ity fa aleo alony amzao
+        this.decisionConstraint = decisionCondition ;
+        while(! equation.allCoeffZeroOrSup()){
+            // jerena ny coefficient min @ ilay equation
+            int minPosition = equation.minPositionCoeff();
+            // alaina izay sup a 0 @ iny colomne iny
+            Double [] sup0= superiorToZero(minPosition) ;
+            if(counterOfDouble(sup0) ==0) throw new Exception("Pas de solution") ;
+            // jerena indray ny minimum ( base / coeff) : pivot
+            int pivotPositionY = pivotPosition(sup0,0) ;
+            // ovaina ilay ery amn sisiny droite iny
+                matrix[pivotPositionY].solutionInit = equation.decisions[minPosition];
+                // lasa soloina ihany koa ilay coeffSolutionInit
+                matrix[pivotPositionY].setCoeffSolutionInit(equation.coeff[minPosition]);
+            // transformation de la ligne du pivot (sur pivot daholo)
+
         }
     }
     protected void bigmMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){

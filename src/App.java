@@ -12,10 +12,10 @@ public class App {
 
 
         MathOptimisation x = new MathOptimisation() ;
-        x.simplexMaximisation("(1)[x](-1)[y](3)[z]", new String []{"(1)[x](1)[y](0)[z]<=20","(1)[x](0)[y](1)[z]=5","(0)[x](1)[y](1)[z]>=10"}, new DYNConstraint("[x][y][z]>=0"));
+        x.simplexMaximization("(1)[x](-1)[y](3)[z]", new String []{"(1)[x](1)[y](0)[z]<=20","(1)[x](0)[y](1)[z]=5","(0)[x](1)[y](1)[z]>=10"}, new DYNConstraint("[x][y][z]>=0"));
 
         MathOptimisation y = new MathOptimisation() ;
-        y.simplexMaximisation("(3)[x1](4)[x2](1)[x3]",new String []{"(1)[x1](2)[x2](2)[x3]<="+(8.0/3.0) ,"(1)[x1](2)[x2](3)[x3]>="+(7.0/3.0)}, new DYNConstraint("[x1][x2][x3]") );
+        y.simplexMaximization("(3)[x1](4)[x2](1)[x3]",new String []{"(1)[x1](2)[x2](2)[x3]<="+(8.0/3.0) ,"(1)[x1](2)[x2](3)[x3]>="+(7.0/3.0)}, new DYNConstraint("[x1][x2][x3]") );
         // System.out.println("hbh");
     }
 }
