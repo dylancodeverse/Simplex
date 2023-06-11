@@ -8,7 +8,7 @@ public class MathOptimisation {
     DYNConstraint decisionConstraint;
 
 
-    public void simplexMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){
+    public void simplexMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
         if(isBigMform(multiconstraintsFormat)) bigmMaximisation(equationSyntax,multiconstraintsFormat,decisionCondition) ;
         else simplexInf(equationSyntax, multiconstraintsFormat, decisionCondition);
 
@@ -21,7 +21,7 @@ public class MathOptimisation {
         return false;
     }
 
-    protected void simplexInf(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){
+    protected void simplexInf(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition) throws Exception{
         setEquation(equationSyntax, multiconstraintsFormat.length);
         multiconstraintsFormat = formatSyntaxForMatrix(multiconstraintsFormat) ;
         setMatrix(multiconstraintsFormat);
@@ -32,7 +32,7 @@ public class MathOptimisation {
             int maxPosition = equation.maxPositionCoeff();
             // alaina izay sup a 0 @ iny colomne iny
             Double [] sup0= superiorToZero(maxPosition) ;
-            if(counterOfDouble(sup0) ==0) return ;
+            if(counterOfDouble(sup0) ==0) throw new Exception("Pas de solution") ;
             // jerena indray ny minimum ( base / coeff) : pivot
             int pivotPositionY = pivotPosition(sup0,0) ;
             // ovaina ilay ery amn sisiny droite iny
@@ -42,6 +42,7 @@ public class MathOptimisation {
             // transformation de chaque ligne bas et haut tel que : Ln =Ln - (Ln.coeff[maxPosition])
             doSimplexLineTransformation( pivotPositionY, maxPosition);
 
+            
         }
     }
     protected void bigmMaximisation(String equationSyntax , String [] multiconstraintsFormat , DYNConstraint decisionCondition){
