@@ -3,6 +3,8 @@
 
 ## How to use it
 
+Context
+
             maximize  3x1 +2x2 +5x3
             subject to :
             x1 +2x2 +x3 <= 430
@@ -10,7 +12,9 @@
             x1 + 4x2    <= 420
             ------
             x1 ,x2 ,x3 >= 0
-/
+
+Code
+
         Simplex x = new Simplex() ;
         x.simplexMaximization("(3)[x1](2)[x2](5)[x3]", new String []{
         "(1)[x1](2)[x2](1)[x3]<=430",
@@ -19,6 +23,7 @@
          new Constraint("(1)[x1](2)[x2](3)[x3]>=0"));
 
 
+Context
 
         Minimize:
         Min  x1 - 3 x2 + 2x3 
@@ -27,13 +32,16 @@
         -2x1 +4x2   <= 12
         -4x1 + 3x2 + 8x3 <= 10
         x1,x2,x3>=0
- /
+
+Code
+
         x.simplexMinimisation("(1)[x1] (-3) [x2]  (2)[x3]", new String []{
             "(3)[x1] (-1) [x2] (+2)[x3] <= 7",
             "(-2)[x1] (+4)[x2] (0)[x3]   <= 12",
             "(-4)[x1] (3)x2 (8)[x3] <= 10"
            } , new Constraint("(1)[x1](1)[x2](1)[x3]>=0"));
 
+Context
 
         maximize using bigM:
         2x1 -2x2 + 3x3
@@ -42,14 +50,17 @@
         -5x1+5x2 +x3 <= 3
         3x1 - 3x2 +x3 >= 5
         x1, x2 ,x3 >=0
- /
+
+Code
+
         x.simplexMaximization("(2)[x1] (-2)[x2] (3)[x3]",new String[]{
             "(1)[x1] (-1)[x2] (+2)[x3] <= 8", 
             "(-5)[x1](+5)[x2] (+1)[x3] <= 3",
             "(3)[x1] (- 3)[x2] (+1)[x3] >= 5"
         }, new Constraint("(1)[x1](1)[x2] >=0"));
 
-/
+
+Context
 
         minimize using bigM:
         35x1 +34 x2
@@ -59,15 +70,17 @@
         2x1 +5x2 >= 420
         x1,x2>=0
 
- */
+Code
+
         x.simplexMinimisation("(35)[x1] (+34) [x2]", new String []{
             "(4)[x1] (+3)[x2] >= 504",
             "(5)[x1] (1)[x2] >= 256",
             "(2)[x1] (+5)[x2] >= 420"
         }, new Constraint("(1)[x1](1)x2>=0"));
 
-        Another test
-/        
+
+Another test
+        
         x.simplexMinimisation("(1)[x1](3)[x2]" ,new String[]{
             "(3)[x1](1)[x2]<=5",
             "(1)[x1](1)[x2]>=3"
