@@ -3,15 +3,13 @@
 
 ## How to use it
 
-       // maximize  3x1 +2x2 +5x3
-        // subject to :
-
+            maximize  3x1 +2x2 +5x3
+            subject to :
             x1 +2x2 +x3 <= 430
             3x2 +2x3    <= 460
             x1 + 4x2    <= 420
+            ------
             x1 ,x2 ,x3 >= 0
-
-        
 /
         Simplex x = new Simplex() ;
         x.simplexMaximization("(3)[x1](2)[x2](5)[x3]", new String []{
@@ -24,12 +22,11 @@
 
         Minimize:
         Min  x1 - 3 x2 + 2x3 
- *      Subject to:
- *      
- *      3x1 - x2 +2x3 <= 7
- *      -2x1 +4x2   <= 12
- *      -4x1 + 3x2 + 8x3 <= 10
- *      x1,x2,x3>=0
+        Subject to:
+        3x1 - x2 +2x3 <= 7
+        -2x1 +4x2   <= 12
+        -4x1 + 3x2 + 8x3 <= 10
+        x1,x2,x3>=0
  /
         x.simplexMinimisation("(1)[x1] (-3) [x2]  (2)[x3]", new String []{
             "(3)[x1] (-1) [x2] (+2)[x3] <= 7",
@@ -40,7 +37,7 @@
 
 /
  *      maximize using bigM:
- *     2 x1 -  2 x2 + 3x3
+ *      2x1 -2x2 + 3x3
  *      Subject to:
  *      x1 -x2 +2x3 <= 8
  *      -5x1+5x2 +x3 <= 3
@@ -70,8 +67,6 @@
             "(2)[x1] (+5)[x2] >= 420"
         }, new Constraint("(1)[x1](1)x2>=0"));
 
-
-/*
         Another test
 /        
         x.simplexMinimisation("(1)[x1](3)[x2]" ,new String[]{
