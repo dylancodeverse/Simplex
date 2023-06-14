@@ -1,5 +1,5 @@
-import DYNMathOptimisation.DYNConstraint;
-import DYNMathOptimisation.MathOptimisation;
+import DYNMathOptimisation.Constraint;
+import DYNMathOptimisation.Simplex;
 
 public class Test {
 
@@ -15,12 +15,12 @@ public class Test {
 
         
 */
-        MathOptimisation x = new MathOptimisation() ;
+        Simplex x = new Simplex() ;
         x.simplexMaximization("(3)[x1](2)[x2](5)[x3]", new String []{
         "(1)[x1](2)[x2](1)[x3]<=430",
         "(3)[x1](0)[x2](2)[x3]<=460",
         "(1)[x1](4)[x2](0)[x3]<= 420"},
-         new DYNConstraint("(1)[x1](2)[x2](3)[x3]>=0"));
+         new Constraint("(1)[x1](2)[x2](3)[x3]>=0"));
 
 
 /*
@@ -38,7 +38,7 @@ public class Test {
             "(-2)[x1] (+4)[x2] (0)[x3]   <= 12",
             "(-4)[x1] (3)x2 (8)[x3] <= 10"
 
-        } , new DYNConstraint("(1)[x1](1)[x2](1)[x3]>=0"));
+        } , new Constraint("(1)[x1](1)[x2](1)[x3]>=0"));
 
 
 /*
@@ -55,7 +55,7 @@ public class Test {
             "(1)[x1] (-1)[x2] (+2)[x3] <= 8", 
             "(-5)[x1](+5)[x2] (+1)[x3] <= 3",
             "(3)[x1] (- 3)[x2] (+1)[x3] >= 5"
-        }, new DYNConstraint("(1)[x1](1)[x2] >=0"));
+        }, new Constraint("(1)[x1](1)[x2] >=0"));
 
 /*
         minimize using bigM:
@@ -72,7 +72,7 @@ public class Test {
             "(4)[x1] (+3)[x2] >= 504",
             "(5)[x1] (1)[x2] >= 256",
             "(2)[x1] (+5)[x2] >= 420"
-        }, new DYNConstraint("(1)[x1](1)x2>=0"));
+        }, new Constraint("(1)[x1](1)x2>=0"));
 
 
 /*
@@ -82,7 +82,7 @@ public class Test {
         x.simplexMinimisation("(1)[x1](3)[x2]" ,new String[]{
             "(3)[x1](1)[x2]<=5",
             "(1)[x1](1)[x2]>=3"
-        } ,new DYNConstraint("(1)[x1](1)x2>=0"));
+        } ,new Constraint("(1)[x1](1)x2>=0"));
 
 
 

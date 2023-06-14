@@ -2,16 +2,16 @@ package DYNMathOptimisation;
 
 import java.util.ArrayList;
 
-public class DYNConstraint {
+public class Constraint {
     
     String originSyntax ;
     Double [] coeff ;
-    String [] decisions;
+    String [] variables;
     StringBuffer condition ;
-    Double limit ;
+    Double secondMember ;
     
 
-    public DYNConstraint(String syntax) {
+    public Constraint(String syntax) {
         originSyntax =syntax ;
         StringBuffer s = new StringBuffer(syntax) ;
         condition = new StringBuffer();
@@ -21,13 +21,13 @@ public class DYNConstraint {
         setDecisions(s, new ArrayList<String>());
         setLimit(s);
     }
-    protected DYNConstraint(String originSyntax, Double[] coeff, String[] decisions, StringBuffer condition,
-                            Double limit) {
+    protected Constraint(String originSyntax, Double[] coeff, String[] variables, StringBuffer condition,
+                            Double secondMember) {
         this.originSyntax = originSyntax;
         this.coeff = coeff;
-        this.decisions = decisions;
+        this.variables = variables;
         this.condition = condition;
-        this.limit = limit;
+        this.secondMember = secondMember;
     }
 
     protected void deleteSpace(StringBuffer a){
@@ -62,17 +62,17 @@ public class DYNConstraint {
         setDecisions(syntax, ls);
 
     }
-    public void setDecisions(String[] decisions) {
-        this.decisions = decisions;
+    public void setDecisions(String[] variables) {
+        this.variables = variables;
     }
-    public void setLimit( StringBuffer limit) {
+    public void setLimit( StringBuffer secondMember) {
         try {
-            this.limit = Double.parseDouble(limit.toString());
+            this.secondMember = Double.parseDouble(secondMember.toString());
         } catch (Exception e) {
             try {
-                condition.append(limit.substring(0 ,1));
-                limit.delete(0,1);
-                setLimit(limit);
+                condition.append(secondMember.substring(0 ,1));
+                secondMember.delete(0,1);
+                setLimit(secondMember);
                     
             } catch (Exception e2) {
                 return;
@@ -107,13 +107,13 @@ public class DYNConstraint {
         for (int i = 0; i < coeff.length; i++) {
             coeff[i] = coeff[i]/division ;
         }
-        limit = limit / division ;
+        secondMember = secondMember / division ;
     }
-    public void setLineMinus(Double coeff , DYNConstraint other){
+    public void setLineMinus(Double coeff , Constraint other){
         for (int i = 0; i < this.coeff.length; i++) {
             this.coeff [i] = this.coeff [i] -(coeff)* other.coeff [i];
         }
-        this.limit = this.limit -coeff *other.limit ;
+        this.secondMember = this.secondMember -coeff *other.secondMember ;
     }
     public boolean allCoeffZeroOrInf(){
         for (int i = 0; i < coeff.length; i++) {
