@@ -35,14 +35,13 @@
            } , new Constraint("(1)[x1](1)[x2](1)[x3]>=0"));
 
 
-/
- *      maximize using bigM:
- *      2x1 -2x2 + 3x3
- *      Subject to:
- *      x1 -x2 +2x3 <= 8
- *      -5x1+5x2 +x3 <= 3
- *      3x1 - 3x2 +x3 >= 5
- *      x1, x2 ,x3 >=0
+        maximize using bigM:
+        2x1 -2x2 + 3x3
+        Subject to:
+        x1 -x2 +2x3 <= 8
+        -5x1+5x2 +x3 <= 3
+        3x1 - 3x2 +x3 >= 5
+        x1, x2 ,x3 >=0
  /
         x.simplexMaximization("(2)[x1] (-2)[x2] (3)[x3]",new String[]{
             "(1)[x1] (-1)[x2] (+2)[x3] <= 8", 
