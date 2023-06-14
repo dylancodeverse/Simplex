@@ -87,3 +87,9 @@ Another test
         } ,new Constraint("(1)[x1](1)x2>=0"));
 
 
+## Farany
+    @ ilay object Simplex no hijerena ny valin'ilay tableau simplexe:
+        equation.secondMember : valin'ilay optimisation
+        matrix.basicVariables : variable de base
+        matrix.SecondMember : result
+        matrix -> array
