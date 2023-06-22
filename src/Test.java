@@ -5,6 +5,20 @@ public class Test {
 
 
     public static void main(String[] args) throws Exception{
+
+        Simplex exam = new Simplex() ;
+        exam.simplexMaximization("(4)[a](5)[b]  ", new String []{
+            "(1)[a](2)[b]<=700" , "(2)[a](1)[b]<=800" , "(0)[a](1)[b]<=300"
+        }, new Constraint("(1)[a](1)[b]>=0"));
+
+        Simplex dual = new Simplex();
+        dual.simplexMinimisation("(800)[t1](700)[t2](300)[t3]", new String []{
+            "(2)[t1](1)[t2](0)[t3]>=4",
+            "(1)[t1](2)[t2](1)[t3]>=5"
+        }
+        ,
+         new Constraint("(1)[t1](1)[t2](1)[t3]"));
+
         // maximize  3x1 +2x2 +5x3
         // subject to :
 /*

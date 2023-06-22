@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "Test",
+            "projectName": "Simplex_7d98b6b8"
+        },
+        {
+            "type": "java",
+            "name": "ExamenSimplex",
+            "request": "launch",
+            "mainClass": "ExamenSimplex",
+            "projectName": "Simplex_1fbd54e7"
+        },
+        {
+            "type": "java",
             "name": "Test_Rotsy",
             "request": "launch",
             "mainClass": "Test_Rotsy",

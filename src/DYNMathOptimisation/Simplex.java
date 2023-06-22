@@ -70,7 +70,6 @@ public class Simplex {
             doSimplexLineTransformation( pivotPositionY, minPosition);
 
         }
-        equation.secondMember*=-1;
     }
     protected void bigmMaximisation(String equationSyntax , String [] multiconstraintsFormat , Constraint decisionCondition) throws Exception{
         setMatrixBigM( equationSyntax ,multiconstraintsFormat, -1);
@@ -133,7 +132,6 @@ public class Simplex {
         for (int i = 0; i < matrix.length; i++) {
             equation.secondMember = equation.secondMember + matrix[i].secondMember*matrix[i].basicVariablesCoefficient;
         }
-        equation.secondMember*=-1 ;
         
     }
     protected Double [] getSumMatrixCoeff(){
